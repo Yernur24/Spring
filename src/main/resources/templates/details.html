@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="main_layout.html"
+      xmlns="http://www.w3.org/1999/html"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
+<head >
+<style>
+
+    .book-form {
+        max-width: 500px;
+        margin: 0 auto;
+        padding: 20px;
+        background-color: #f8f9fa;
+        border: 1px solid #ced4da;
+        border-radius: 5px;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    label {
+        font-weight: bold;
+    }
+
+    .btn-primary {
+        background-color: #007bff;
+        color: #fff;
+        border: none;
+    }
+
+    .btn-primary:hover {
+        background-color: #0056b3;
+    }
+
+    .book-container {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 20px;
+        margin-top: 30px;
+    }
+
+    .book-image {
+        flex: 1;
+        max-width: 300px;
+    }
+
+    .book-image img {
+        width: 100%;
+        height: auto;
+        border: 1px solid #ced4da;
+        border-radius: 5px;
+    }
+
+    .book-form-container {
+        flex: 2;
+        max-width: 600px;
+        padding: 20px;
+        background-color: #f8f9fa;
+        border: 1px solid #ced4da;
+        border-radius: 5px;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    label {
+        font-weight: bold;
+    }
+
+    .btn-primary {
+        background-color: #007bff;
+        color: #fff;
+        border: none;
+    }
+
+    .btn-primary:hover {
+        background-color: #0056b3;
+    }
+
+</style>
+</head>
+<body>
+<div class="container " layout:fragment="siteContent">
+    <div class="row" th:if="${kitap!=null}">
+       <div class="col-6">
+           <table class="table" >
+               <tr th:each="genre:${genres}">
+                 <form th:action="@{'/assign-genre'}" method="post">
+                     <input type="hidden" name="book_id" th:value="${kitap.id}">
+                     <input type="hidden" name="genre_id" th:value="${genre.id}">
+                     <td th:text="${genre.id}"></td>
+                     <td th:text="${genre.name}">
+                     <td>
+                         <button sec:authorize="hasAnyRole('ROLE_ADMIN')" class="btn btn-success btn-sm"> >>></button>
+                     </td>
+                 </form>
+               </tr>
+           </table>
+       </div>
+        <div class="col-6">
+            <table class="table" >
+                <tr th:each="genre:${kitap.genres}">
+                    <form th:action="@{'/unassign-genre'}" method="post">
+                        <input type="hidden" name="book_id" th:value="${kitap.id}">
+                        <input type="hidden" name="genre_id" th:value="${genre.id}">
+                        <td th:text="${genre.id}"></td>
+                        <td th:text="${genre.name}">
+                        <td>
+                            <button class="btn btn-danger btn-sm" sec:authorize="hasAnyRole('ROLE_ADMIN')"><<<</button>
+                        </td>
+                    </form>
+                </tr>
+            </table>
+        </div>
+    </div>
+    <div class="container book-container">
+        <!-- Блок с изображением -->
+        <div class="book-image">
+            <img th:src="${kitap.img}" alt="Изображение книги">
+        </div>
+
+        <!-- Блок с формой -->
+        <div class="book-form-container">
+            <form method="post" th:action="@{'/update-book'}" enctype="multipart/form-data">
+                <input type="hidden" name="_method" value="PUT">
+                <input type="hidden" name="id" th:value="${kitap.id}">
+
+                <div class="form-group" sec:authorize="hasRole('ROLE_ADMIN')">
+                    <label for="img">Изображение:</label>
+                    <input type="file" id="img" name="image" class="form-control" th:value="${kitap.img}">
+                </div>
+
+                <div class="form-group">
+                    <label for="name">Название:</label>
+                    <input type="text" id="name" name="name" class="form-control" th:value="${kitap.name}"
+                           sec:authorize="hasRole('ROLE_ADMIN')" required>
+                    <input type="text" id="name" name="name" class="form-control" th:value="${kitap.name}"
+                           sec:authorize="!hasRole('ROLE_ADMIN')" readonly>
+                </div>
+
+                <div class="form-group">
+                    <label for="author">Автор:</label>
+                    <select id="author" class="form-select" name="authorModel_id" sec:authorize="hasRole('ROLE_ADMIN')">
+                        <option th:each="author:${authors}"
+                                th:value="${author.id}"
+                                th:selected="${kitap.authorModel.id==author.id}"
+                                th:text="${author.fullname}"></option>
+                    </select>
+                    <select id="author" class="form-select" name="authorModel_id" sec:authorize="!hasRole('ROLE_ADMIN')" readonly>
+                        <option th:each="author:${authors}"
+                                th:value="${author.id}"
+                                th:selected="${kitap.authorModel.id==author.id}"
+                                th:text="${author.fullname}"></option>
+                    </select>
+                </div>
+
+                <div class="form-floating">
+                    <span>Описание:</span>
+                    <textarea class="form-control" id="floatingTextarea2" name="description" th:text="${kitap.description}" style="height: 100px"
+                              sec:authorize="hasRole('ROLE_ADMIN')"></textarea>
+                    <textarea class="form-control" id="floatingTextarea2" name="description" th:text="${kitap.description}" style="height: 100px"
+                              sec:authorize="!hasRole('ROLE_ADMIN')" readonly></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="publicationYear">Дата издательства:</label>
+                    <input type="number" id="publicationYear" name="publicationYear" class="form-control" th:value="${kitap.publicationYear}"
+                           sec:authorize="hasRole('ROLE_ADMIN')" required>
+                    <input type="number" id="publicationYear" name="publicationYear" class="form-control" th:value="${kitap.publicationYear}"
+                           sec:authorize="!hasRole('ROLE_ADMIN')" readonly>
+                </div>
+
+                <div class="form-group">
+                    <label for="price">Цена:</label>
+                    <input type="number" id="price" name="price" class="form-control" th:value="${kitap.price}"
+                           sec:authorize="hasRole('ROLE_ADMIN')" required>
+                    <input type="number" id="price" name="price" class="form-control" th:value="${kitap.price}"
+                           sec:authorize="!hasRole('ROLE_ADMIN')" readonly>
+                </div>
+
+                <button type="submit" class="btn btn-primary" sec:authorize="hasAnyRole('ROLE_ADMIN')">Сохранить</button>
+                <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal" sec:authorize="hasAnyRole('ROLE_ADMIN')">Удалить</button>
+            </form>
+
+            <form method="post" th:action="@{'/add-to-cart'}" th:if="${kitap != null}" style="text-align: center">
+                <input type="hidden" name="bookId" th:value="${kitap.id}">
+                <button type="submit" class="btn btn-success mt-3" th:disabled="${isInCart}">Добавить в корзину</button>
+            </form>
+            <p th:if="${isInCart}" class="text-success" style="text-align: center">Книга уже добавлена в корзину.</p>
+        </div>
+    </div>
+</div>
+<footer th:insert="footer.html">
+</footer>
+   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz" crossorigin="anonymous"></script>
+</body>
+</html>

@@ -1,0 +1,56 @@
+   <!DOCTYPE html>
+
+    <html lang="en" xmlns:th="http://www.thymeleaf.org"
+          xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="main_layout.html">
+   <head >
+    </head>
+   <div class="container" layout:fragment="side-bar">
+       <p class="lead">
+           Человек - дитя своего времени.
+           Если он плох, в этом виновны его современники.
+       </p>
+       <h5 class="text-info"> Абай Кунанбаев</h5>
+   </div>
+    <div class="container" layout:fragment="siteContent">
+              <div class="row">
+                    <div class="col-8 mx-auto">
+                        <div class="container mt-5" style="min-height: 800px" >
+                            <h1 class="mb-4">Добавить книг</h1>
+                            <form  th:action="@{'/add-book'}" method="post" enctype="multipart/form-data">
+                                <div class="form-group">
+                                    <label for="img">Изображение:</label>
+                                    <input type="file" id="img" name="image" class="form-control">
+                                </div>
+                                <div class="form-group">
+                                    <label for="name">Название:</label>
+                                    <input type="text" id="name" name="name" class="form-control" required>
+                                </div>
+                                <div class="form-group">
+                                    <label >Автор:</label>
+                                    <select class="form-select" name="authorModel_id">
+                                        <option th:each="author:${authors}" th:value="${author.id}"
+                                                th:text="${author.fullname}"></option>
+                                    </select>
+                                </div>
+                                <div class="form-floating">
+                                    <span>Описание:</span>
+                                    <textarea class="form-control" placeholder="Leave a description here" id="floatingTextarea2" name="description" style="height: 100px" ></textarea>
+                                </div>
+                                <div class="form-group">
+                                    <label for="publicationYear">Дата издательства:</label>
+                                    <input type="number" id="publicationYear" name="publicationYear" class="form-control" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="price">Цена :</label>
+                                    <input type="number" id="price" name="price" class="form-control" required>
+                                </div>
+                                <button type="submit" class="btn btn-primary">Добавить</button>
+                            </form>
+                        </div>
+                    </div>
+            </div>
+    </div>
+    <footer th:insert="footer.html">
+    </footer>
+    </body>
+    </html>

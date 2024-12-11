@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="main_layout.html"
+      xmlns="http://www.w3.org/1999/html"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
+
+<div layout:fragment="side-bar">
+
+</div>
+<div layout:fragment="siteContent">
+  <div class="d-flex justify-content-center flex-column mt-4">
+      <div class="w-100">
+        <div class="card shadow-sm">
+          <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">Пользователи</h5>
+          </div>
+          <div class="card-body p-0">
+            <table class="table table-hover table-striped table-bordered mb-0">
+              <thead>
+              <tr>
+                <th scope="col">ID</th>
+                <th scope="col">Пользователь</th>
+                <th scope="col">Email</th>
+                <th scope="col">Роли</th>
+                <th scope="col">Роли изменить</th>
+                <th scope="col" class="text-center">Действие</th>
+              </tr>
+              </thead>
+              <tbody>
+              <tr th:each="user : ${users}">
+                <td th:text="${user.id}"></td>
+                <td th:text="${user.fullname}"></td>
+                <td th:text="${user.email}"></td>
+                <td>
+                  <ul>
+                    <li th:each="permission : ${user.permissions}" th:text="${permission.role}"></li>
+                  </ul>
+                </td>
+                <td>
+                  <form th:action="@{/admin-panel/change-role}" method="post">
+                    <input type="hidden" name="userId" th:value="${user.id}" />
+                    <select name="role">
+                      <option value="ROLE_ADMIN">Администратор</option>
+                      <option value="ROLE_USER">Пользователь</option>
+                    </select>
+                    <button type="submit">Изменить роль</button>
+                  </form>
+                </td>
+                <td class="text-center">
+                  <form th:action="@{'/user/toggle/ban'}" method="post" class="d-inline">
+                    <input type="hidden" th:value="${user.id}" name="user_id">
+                    <input type="hidden" th:value="${!user.isBanned}" name="ban">
+
+                    <button class="btn btn-sm btn-danger" th:if="${!user.isBanned}" title="Забанить">
+                      <i class="bi bi-person-x"></i> Забанить
+                    </button>
+
+                    <button class="btn btn-sm btn-success" th:if="${user.isBanned}" title="Разбанить">
+                      <i class="bi bi-person-check"></i> Разбанить
+                    </button>
+                  </form>
+                </td>
+
+              </tr>
+              </tbody>
+
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Книги -->
+      <div class="w-100">
+        <div class="card shadow-sm">
+          <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">Книги</h5>
+          </div>
+          <div class="card-body p-0">
+            <table class="table table-hover table-striped table-bordered mb-0">
+              <thead class="table-light">
+              <tr>
+                <th scope="col">ID</th>
+                <th scope="col">Название</th>
+                <th scope="col">Автор</th>
+                <th scope="col">Описание</th>
+                <th scope="col">Год</th>
+                <th scope="col">Цена</th>
+              </tr>
+              </thead>
+              <tbody>
+              <tr th:each="book : ${books}">
+                <td th:text="${book.id}"></td>
+                <td th:text="${book.name}"></td>
+                <td th:text="${book.authorModel.fullname}"></td>
+                <td th:text="${book.description}"></td>
+                <td th:text="${book.publicationYear}"></td>
+                <td th:text="${book.price}"></td>
+              </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    <!-- Заказы -->
+    <div class="row mt-4">
+      <div class="col-md-12">
+        <div class="card shadow-sm">
+          <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">Заказы</h5>
+          </div>
+          <div class="card-body p-0">
+            <table class="table table-hover table-striped table-bordered mb-0">
+              <thead class="table-light">
+              <tr>
+                <th scope="col">ID</th>
+                <th scope="col">Пользователь</th>
+                <th scope="col">Книги</th>
+                <th scope="col">Общая стоимость</th>
+                <th scope="col">Статус</th>
+                <th scope="col">Действие</th>
+              </tr>
+              </thead>
+              <tbody>
+              <tr th:each="order : ${orders}"
+                  th:classappend="${order.status == 'Подтверждено' ? 'table-success' : (order.status == 'Отклонено' ? 'table-danger' : '')}">
+                <td th:text="${order.id}"></td>
+                <td th:text="${order.userName}"></td>
+                <td>
+                  <ul>
+                    <li th:each="bookName : ${order.bookNames}" th:text="${bookName}"></li>
+                  </ul>
+                </td>
+                <td th:text="${order.totalPrice} + ' тенге'"></td>
+                <td th:text="${order.status}"></td>
+                <td>
+                  <form th:if="${order.status == 'Ожидание подтверждения'}" th:action="@{/admin/orders/confirm}" method="post" class="d-inline">
+                    <input type="hidden" name="orderId" th:value="${order.id}">
+                    <button class="btn btn-success btn-sm">Подтвердить</button>
+                  </form>
+                  <form th:if="${order.status == 'Ожидание подтверждения'}" th:action="@{/admin/orders/reject}" method="post" class="d-inline">
+                    <input type="hidden" name="orderId" th:value="${order.id}">
+                    <button class="btn btn-danger btn-sm">Отклонить</button>
+                  </form>
+                </td>
+              </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+  <!--  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>-->
+</div>

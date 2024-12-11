@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="main_layout.html">
+<head >
+</head>
+<body>
+<div layout:fragment="side-bar">
+    <div class="container">
+        <form th:action="@{'/add-author'}" method="post">
+            <h3 class="text-center">Добавление автора</h3>
+            <div class="mb-3">
+                <label for="exampleFormControlInput1" class="form-label">Имя автора:</label>
+                <input type="text" class="form-control" id="exampleFormControlInput1"name='fullname' >
+            </div>
+            <div class="mb-3">
+                <label for="exampleFormControlInput2" class="form-label">Прозвище:</label>
+                <input type="text" class="form-control" id="exampleFormControlInput2"name='nick_name' >
+            </div>
+            <button type="submit" class="btn btn-primary">Добавить</button>
+        </form>
+    </div>
+</div>
+<footer th:insert="footer.html"></footer>
+</body>
+</html>

@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="main_layout.html"
+      xmlns="http://www.w3.org/1999/html"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security" >
+
+<div layout:fragment="side-bar">
+
+</div>
+<div layout:fragment="siteContent" class="container">
+    <h2 class="mb-4">Ваша корзина</h2>
+
+    <div th:if="${cart.books.isEmpty()}">
+        <div class="alert alert-warning" role="alert">
+            Ваша корзина пуста. Пожалуйста, добавьте книги в корзину.
+        </div>
+    </div>
+
+    <div th:if="${not #lists.isEmpty(cart.books)}">
+        <div class="row">
+            <div class="col-12">
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                        <tr>
+                            <th>Название</th>
+                            <th>Автор</th>
+                            <th>Цена</th>
+                            <th>Действия</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="book : ${cart.books}">
+                            <td th:text="${book.name}"></td>
+                            <td th:text="${book.authorModel.fullname}"></td>
+                            <td th:text="${book.price}"></td>
+                            <td>
+                                <form th:action="@{/remove-from-cart}" method="post">
+                                    <input type="hidden" name="bookId" th:value="${book.id}">
+                                    <button class="btn btn-danger btn-sm">Удалить</button>
+                                </form>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="d-flex justify-content-between align-items-center mt-4">
+                    <p><strong>Общая стоимость:</strong> <span th:text="${cart.totalPrice}"></span> тенге</p>
+                    <form th:action="@{/checkout}" method="post">
+                        <button type="submit" class="btn-buy">Купить</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
